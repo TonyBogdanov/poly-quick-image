@@ -1,0 +1,28 @@
+{
+  "name": "poly-quick-image",
+  "homepage": "https://github.com/TonyBogdanov/poly-quick-image",
+  "authors": [
+    "Tony Bogdanov <tonybogdanov@gmail.com>"
+  ],
+  "description": "A Polymer element for quick / placeholder images",
+  "main": "poly-quick-image.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.6.1",
+    "iron-image": "^1.2.5",
+    "iron-localstorage": "^1.0.6",
+    "poly-crypt": "*",
+    "urijs": "medialize/URI.js#^1.18.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "^1.1.7",
+    "bottle": "*"
+  }
+}
