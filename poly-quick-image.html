@@ -81,6 +81,21 @@ Each element is set to `width: 100%; height: 100%` by default, explicitly specif
             },
 
             /**
+             * Setting this to `TRUE` will disable trying to generate and cache an image placeholder (per image) once
+             * it fails the first time. Failure could occur, for example, if the browser does not support `<canvas>`,
+             * or if the image is hosted on another host (cross origin issue).
+             *
+             * This is recommended for production purposes where it is better to disable the placeholder functionality
+             * altogether once it fails, than to strain the browser by constantly trying to regenerate it.
+             *
+             * Do look for errors in the console.
+             */
+            conservativeCaching:        {
+                type:                   Boolean,
+                value:                  false
+            },
+
+            /**
              * See [iron-image.src](https://elements.polymer-project.org/elements/iron-image#property-src)
              */
             src:                        {
@@ -171,7 +186,6 @@ Each element is set to `width: 100%; height: 100%` by default, explicitly specif
         },
 
         _cacheEmpty:                    function() {
-            var canvas                  = this.$.canvas.getContext('2d');
             var image                   = new Image();
 
             image.addEventListener('load', function() {
@@ -183,12 +197,21 @@ Each element is set to `width: 100%; height: 100%` by default, explicitly specif
                     newWidth            = newHeight * image.width / image.height;
                 }
 
-                this.$.canvas.width     = newWidth;
-                this.$.canvas.height    = newHeight;
+                try {
+                    this.$.canvas.width     = newWidth;
+                    this.$.canvas.height    = newHeight;
 
-                canvas.drawImage(image, 0, 0, newWidth, newHeight);
+                    this.$.canvas.getContext('2d').drawImage(image, 0, 0, newWidth, newHeight);
 
-                this._cached            = this.$.canvas.toDataURL('image/png');
+                    this._cached        = this.$.canvas.toDataURL('image/png');
+                } catch(e) {
+                    console.log('<poly-quick-image>', 'Placeholder generation failed:', e);
+                    if(this.conservativeCaching) {
+                        console.log('Conservative caching is on, will not attempt to re-generate the placeholder ' +
+                                'until the cache is cleared or the salt is changed.');
+                        this._cached    = 'about:blank';
+                    }
+                }
             }.bind(this));
 
             image.src                   = this._getAbsoluteSrc();
