@@ -1,11 +1,13 @@
-# poly-cover-image
+# poly-quick-image
 
 [![Buy Me a Coffee](http://static.tonybogdanov.com/github/coffee.svg)](http://ko-fi.co/1236KUKJNC96B)
 
 [Demo & Documentation](http://tonybogdanov.github.io/poly-quick-image/bower_components/poly-quick-image/index.html)
 
 `<poly-quick-image>` uses `<iron-image>` to display a small placeholder (blurred) version of an image while the full
-image loads in the background.
+image loads in the background. The placeholder is generated in the browser using `<canvas>` if supported, then cached indefinitely with `localStorage`.
+
+Inherently you can also use the element to display a `background-size:cover` image by setting `sizing="cover"` (formerly achieved with [poly-cover-image](https://github.com/TonyBogdanov/poly-cover-image)).
 
 ## Dependencies
 
