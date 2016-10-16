@@ -155,20 +155,18 @@ Each element is set to `width: 100%; height: 100%` by default, explicitly specif
             },
 
             /**
-             * See [iron-image.width](https://elements.polymer-project.org/elements/iron-image#property-width)
+             * Optionally specify a width for the element using a CSS compatible unit, e.g. `100px`.
              */
             width:                      {
-                type:                   Number,
-                value:                  null,
+                type:                   String,
                 observer:               '_widthChanged'
             },
 
             /**
-             * See [iron-image.height](https://elements.polymer-project.org/elements/iron-image#property-height)
+             * Optionally specify a width for the element using a CSS compatible unit, e.g. `100px`.
              */
             height:                     {
-                type:                   Number,
-                value:                  null,
+                type:                   String,
                 observer:               '_heightChanged'
             }
         },
@@ -218,11 +216,11 @@ Each element is set to `width: 100%; height: 100%` by default, explicitly specif
         },
 
         _widthChanged:                  function() {
-            this.style.width            = isNaN(this.width) ? this.width : this.width + 'px';
+            this.style.width            = this.width;
         },
 
         _heightChanged:                 function() {
-            this.style.height           = isNaN(this.height) ? this.height : this.height + 'px';
+            this.style.height           = this.height;
         }
     });
 </script>
