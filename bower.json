@@ -5,6 +5,7 @@
     "Tony Bogdanov <tonybogdanov@gmail.com>"
   ],
   "description": "A Polymer element for quick / placeholder images",
+  "keywords": ["web-components"],
   "main": "poly-quick-image.html",
   "license": "MIT",
   "ignore": [
