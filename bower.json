@@ -5,7 +5,9 @@
     "Tony Bogdanov <tonybogdanov@gmail.com>"
   ],
   "description": "A Polymer element for quick / placeholder images",
-  "keywords": ["web-components"],
+  "keywords": [
+    "web-components"
+  ],
   "main": "poly-quick-image.html",
   "license": "MIT",
   "ignore": [
@@ -17,10 +19,10 @@
   ],
   "dependencies": {
     "polymer": "^1.6.1",
-    "iron-image": "^1.2.5",
     "iron-localstorage": "^1.0.6",
     "poly-crypt": "*",
-    "urijs": "medialize/URI.js#^1.18.2"
+    "urijs": "medialize/URI.js#^1.18.2",
+    "tonybogdanov-iron-image": "TonyBogdanov/iron-image#master"
   },
   "devDependencies": {
     "iron-component-page": "^1.1.7",
