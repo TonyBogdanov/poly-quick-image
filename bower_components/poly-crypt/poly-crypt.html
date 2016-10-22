@@ -1,0 +1,106 @@
+<!-- Dependencies -->
+<link rel="import" href="../polymer/polymer.html">
+
+<script src="algos/md5.js"></script>
+<script src="algos/sha1.js"></script>
+<script src="algos/base64.js"></script>
+
+<!--
+`<poly-crypt>` provides a family of cryptographic algorithms through a [Polymer](https://polymer-project.org) element.
+
+---
+
+Supported algorithms are:
+
+| Algorithm | Additional options |
+| - | - |
+| `md5` | *none* |
+| `sha1` | *none* |
+| `base64encode` | *none* |
+| `base64decode` | *none* |
+
+@demo
+-->
+<dom-module id="poly-crypt">
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is:                             'poly-crypt',
+
+        properties:                     {
+            /**
+             * Use this to specify the name of the algorithm.
+             */
+            algorithm:                  {
+                type:                   String,
+                observer:               '_algorithmChanged'
+            },
+
+            /**
+             * Use this to specify the input string to be encrypted.
+             */
+            input:                      {
+                type:                   String,
+                observer:               '_inputChanged'
+            },
+
+            /**
+             * This is populated with the result of the encryption.
+             */
+            output:                     {
+                type:                   String,
+                notify:                 true,
+                readOnly:               true
+            },
+
+            /**
+             * Setting this to `TRUE` will automatically call `encrypt()` every time `algorithm` or `input` is changed.
+             */
+            auto:                       {
+                type:                   Boolean
+            },
+
+            /**
+             * This can be used to specify additional options if the target algorithm requires it.
+             */
+            options:                    {
+                type:                   Object,
+                value:                  {}
+            }
+        },
+
+        _algorithmChanged:              function() {
+            if(this.auto) {
+                this.encrypt();
+            }
+        },
+
+        _inputChanged:                  function() {
+            if(this.auto) {
+                this.encrypt();
+            }
+        },
+
+        /**
+         * Performs encryption and populates `output`.
+         * Both `algorithm` and `input` must be set for this to run.
+         */
+        encrypt:                        function() {
+            if(!this.input) {
+                return console.log('<poly-crypt>', 'Input is not set, encrypt() will not run.');
+            }
+            if(!this.algorithm) {
+                return console.log('<poly-crypt>', 'Algorithm is not set, encrypt() will not run.');
+            }
+            if(-1 == Object.keys(window.POLY_CRYPT).indexOf(this.algorithm)) {
+                return console.log('<poly-crypt>', 'Specified algorithm is not supported, encrypt() will not run.',
+                        this.algorithm);
+            }
+            this._setOutput(window.POLY_CRYPT[this.algorithm].call(this));
+        }
+    });
+</script>

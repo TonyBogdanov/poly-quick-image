@@ -1,0 +1,34 @@
+<!-- Dependencies -->
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../poly-crypt.html">
+
+<dom-module id="x-demo">
+    <template>
+        <poly-crypt auto algorithm="[[algorithm]]" input="[[input]]" output="{{output}}"></poly-crypt>
+
+        <h1>Algorithm:</h1>
+        <pre>[[algorithm]]</pre>
+
+        <h2>Input:</h2>
+        <pre>[[input]]</pre>
+
+        <h2>Output:</h2>
+        <pre>[[output]]</pre>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is:                             'x-demo',
+
+        properties:                     {
+            algorithm:                  {
+                type:                   String
+            },
+
+            input:                      {
+                type:                   String
+            }
+        }
+    });
+</script>

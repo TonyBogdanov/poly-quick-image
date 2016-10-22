@@ -1,0 +1,226 @@
+<!-- Dependencies -->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../poly-crypt/poly-crypt.html">
+<link rel="import" href="../tonybogdanov-iron-image/iron-image.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="poly-quick-image-styles-shared.html">
+
+<script src="../urijs/src/URI.min.js"></script>
+
+<!--
+`<poly-quick-image>` uses `<iron-image>` to display a small placeholder (blurred) version of an image while the full
+  image loads in the background. The placeholder image is auto-generated once via `<canvas>` and then cached in
+  `localStorage`. For invalidating the cache, see `salt`.
+
+Each element is set to `width: 100%; height: 100%` by default, explicitly specifying the size is recommended.
+
+@demo
+-->
+<dom-module id="poly-quick-image">
+    <template>
+        <style include="poly-quick-image-styles"></style>
+
+        <canvas
+                id="canvas"
+                hidden></canvas>
+
+        <poly-crypt
+                algorithm="md5"
+                input="[[_src]]"
+                output="{{_hash}}"
+                auto
+                hidden></poly-crypt>
+
+        <iron-localstorage
+                name="[[_getStorageNotation(_hash, salt)]]"
+                value="{{_cached}}"
+                use-raw
+                hidden></iron-localstorage>
+
+        <iron-image
+                id="image"
+                placeholder="[[_cached]]"
+                src="[[_src]]"
+                alt="[[alt]]"
+                sizing="[[sizing]]"
+                position="[[position]]"
+                loaded="{{loaded}}"
+                loading="{{loading}}"
+                error="{{error}}"
+                width="[[width]]"
+                preload
+                fade></iron-image>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is:                             'poly-quick-image',
+
+        properties:                     {
+            _src:                       {
+                type:                   String,
+                computed:               '_getAbsoluteSrc(src)'
+            },
+
+            _cached:                    {
+                type:                   String
+            },
+
+            _hash:                      {
+                type:                   String
+            },
+
+            /**
+             * Change this to any non-empty string to clear and regenerate all cached placeholders.
+             * Placeholders are stored in `localStorage` per this salt value.
+             */
+            salt:                       {
+                type:                   String,
+                value:                  ''
+            },
+
+            /**
+             * Setting this to `TRUE` will disable trying to generate and cache an image placeholder (per image) once
+             * it fails the first time. Failure could occur, for example, if the browser does not support `<canvas>`,
+             * or if the image is hosted on another host (cross origin issue).
+             *
+             * This is recommended for production purposes where it is better to disable the placeholder functionality
+             * altogether once it fails, than to strain the browser by constantly trying to regenerate it.
+             *
+             * Do look for errors in the console.
+             */
+            conservativeCaching:        {
+                type:                   Boolean,
+                value:                  false
+            },
+
+            /**
+             * See [iron-image.src](https://elements.polymer-project.org/elements/iron-image#property-src)
+             */
+            src:                        {
+                type:                   String,
+                value:                  ''
+            },
+
+            /**
+             * See [iron-image.alt](https://elements.polymer-project.org/elements/iron-image#property-alt)
+             */
+            alt:                        {
+                type:                   String,
+                value:                  null
+            },
+
+            /**
+             * See [iron-image.sizing](https://elements.polymer-project.org/elements/iron-image#property-sizing)
+             */
+            sizing:                     {
+                type:                   String,
+                value:                  null
+            },
+
+            /**
+             * See [iron-image.position](https://elements.polymer-project.org/elements/iron-image#property-position)
+             */
+            position:                   {
+                type:                   String,
+                value:                  'center'
+            },
+
+            /**
+             * See [iron-image.loaded](https://elements.polymer-project.org/elements/iron-image#property-loaded)
+             */
+            loaded:                     {
+                notify:                 true,
+                type:                   Boolean,
+                value:                  false
+            },
+
+            /**
+             * See [iron-image.loading](https://elements.polymer-project.org/elements/iron-image#property-loading)
+             */
+            loading:                    {
+                notify:                 true,
+                type:                   Boolean,
+                value:                  false
+            },
+
+            /**
+             * See [iron-image.error](https://elements.polymer-project.org/elements/iron-image#property-error)
+             */
+            error:                      {
+                notify:                 true,
+                type:                   Boolean,
+                value:                  false
+            },
+
+            /**
+             * Optionally specify a width for the element using a CSS compatible unit, e.g. `100px`.
+             */
+            width:                      {
+                type:                   String,
+                observer:               '_widthChanged'
+            },
+
+            /**
+             * Optionally specify a width for the element using a CSS compatible unit, e.g. `100px`.
+             */
+            height:                     {
+                type:                   String,
+                observer:               '_heightChanged'
+            }
+        },
+
+        listeners:                      {
+            'iron-localstorage-load-empty': '_cacheEmpty'
+        },
+
+        _getAbsoluteSrc:                function() {
+            return (new URI(this.src)).absoluteTo(document.location.toString()).toString();
+        },
+
+        _getStorageNotation:            function() {
+            return 'poly-quick-image:' + this.salt.toString() + ':' + this._hash;
+        },
+
+        _cacheEmpty:                    function() {
+            var image                   = new Image();
+
+            image.addEventListener('load', function() {
+                var newWidth            = 6;
+                var newHeight           = newWidth * image.height / image.width;
+
+                if(newHeight < 6) {
+                    newHeight           = 6;
+                    newWidth            = newHeight * image.width / image.height;
+                }
+
+                try {
+                    this.$.canvas.width     = newWidth;
+                    this.$.canvas.height    = newHeight;
+
+                    this.$.canvas.getContext('2d').drawImage(image, 0, 0, newWidth, newHeight);
+
+                    this._cached        = this.$.canvas.toDataURL('image/png');
+                } catch(e) {
+                    console.log('<poly-quick-image>', 'Placeholder generation failed:', e);
+                    if(this.conservativeCaching) {
+                        console.log('Conservative caching is on, will not attempt to re-generate the placeholder ' +
+                                'until the cache is cleared or the salt is changed.');
+                        this._cached    = 'about:blank';
+                    }
+                }
+            }.bind(this));
+
+            image.src                   = this._getAbsoluteSrc();
+        },
+
+        _widthChanged:                  function() {
+            this.style.width            = this.width;
+        },
+
+        _heightChanged:                 function() {
+            this.style.height           = this.height;
+        }
+    });
+</script>

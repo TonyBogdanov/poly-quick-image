@@ -1,0 +1,35 @@
+{
+  "name": "poly-crypt",
+  "homepage": "https://github.com/TonyBogdanov/poly-crypt",
+  "authors": [
+    "Tony Bogdanov <tonybogdanov@gmail.com>"
+  ],
+  "description": "A Polymer element for cryptography",
+  "keywords": [
+    "web-components"
+  ],
+  "main": "poly-crypt.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "^1.6.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "^1.1.7"
+  },
+  "_release": "0ae9c681f7",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "0ae9c681f7a74b083fe4029ae8a49d4d98cb1847"
+  },
+  "_source": "https://github.com/TonyBogdanov/poly-crypt.git",
+  "_target": "*",
+  "_originalSource": "poly-crypt"
+}
